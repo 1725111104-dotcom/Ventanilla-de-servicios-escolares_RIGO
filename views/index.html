@@ -1,0 +1,74 @@
+{% extends 'layout.html' %}
+
+{% block contenido %}
+
+<h1>Ventanilla de Servicios Escolares</h1>
+<p>Sistema de fila con base de datos SQLite (PEPS: Primeras Entradas, Primeras Salidas)</p>
+
+{% with mensajes = get_flashed_messages() %}
+    {% if mensajes %}
+        {% for mensaje in mensajes %}
+            <p>{{ mensaje }}</p>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<h2>Agregar estudiante a la fila</h2>
+<form method="POST" action="{{ url_for('agregar') }}">
+    <label for="matricula">Matrícula</label><br>
+    <input type="text" id="matricula" name="matricula" required><br><br>
+
+    <label for="nombre">Nombre</label><br>
+    <input type="text" id="nombre" name="nombre" required><br><br>
+
+    <label for="carrera">Carrera</label><br>
+    <input type="text" id="carrera" name="carrera" required><br><br>
+
+    <label for="tramite">Trámite a realizar</label><br>
+    <input type="text" id="tramite" name="tramite" required><br><br>
+
+    <button type="submit">Agregar a la fila</button>
+</form>
+
+<h2>Atención</h2>
+<p>Estudiantes esperando: {{ total }}</p>
+
+{% if vacia %}
+    <p>La fila está vacía. No hay estudiantes esperando.</p>
+{% else %}
+    <p>Siguiente en la fila: {{ siguiente['nombre'] }} - Trámite: {{ siguiente['tramite'] }}</p>
+{% endif %}
+
+<form method="POST" action="{{ url_for('atender') }}">
+    <button type="submit" {% if vacia %}disabled{% endif %}>Atender siguiente estudiante</button>
+</form>
+
+<h2>Estudiantes en espera</h2>
+<table border="1" cellpadding="5">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Matrícula</th>
+            <th>Nombre</th>
+            <th>Carrera</th>
+            <th>Trámite</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if vacia %}
+            <tr><td colspan="5">No hay estudiantes en la fila.</td></tr>
+        {% else %}
+            {% for estudiante in todos %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ estudiante['matricula'] }}</td>
+                    <td>{{ estudiante['nombre'] }}</td>
+                    <td>{{ estudiante['carrera'] }}</td>
+                    <td>{{ estudiante['tramite'] }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </tbody>
+</table>
+
+{% endblock %}
